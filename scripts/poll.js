@@ -126,8 +126,16 @@ async function main() {
 
   const cands = items.filter((i) => i.title && KEYWORDS.test(i.title));
   const byKey = new Map(cands.map((i) => [keyOf(i.title), i]));
-  const newKeys = await rpc('ma_mark_seen', { secret: INGEST_SECRET, keys: [...byKey.keys()] });
-  const fresh = newKeys.map((k) => byKey.get(k)).slice(0, Number(MAX_PER_RUN));
+  // Markera som sedda i omgångar och sluta när vi har nog många nya, så att resten analyseras nästa körning.
+  const max = Number(MAX_PER_RUN);
+  const allKeys = [...byKey.keys()];
+  const fresh = [];
+  for (let i = 0; i < allKeys.length && fresh.length < max;) {
+    const size = max - fresh.length; // aldrig fler än vi hinner analysera
+    const newKeys = await rpc('ma_mark_seen', { secret: INGEST_SECRET, keys: allKeys.slice(i, i + size) });
+    fresh.push(...newKeys.map((k) => byKey.get(k)));
+    i += size;
+  }
   console.log(`${items.length} artiklar, ${cands.length} kandidater, ${fresh.length} nya att analysera`);
   if (!fresh.length) return;
 
