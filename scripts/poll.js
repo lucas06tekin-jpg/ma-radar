@@ -1,6 +1,7 @@
 // Körs av GitHub Actions: hämtar M&A-nyheter, analyserar med Gemini, sparar i Supabase och skickar push.
 import Parser from 'rss-parser';
 import webpush from 'web-push';
+import { readArticle } from './article.js';
 
 const {
   GEMINI_API_KEY, SUPABASE_URL, SUPABASE_KEY, INGEST_SECRET,
@@ -44,7 +45,7 @@ const FEEDS = [
 ];
 const KEYWORDS = /acqui|merger|merge|takeover|buyout|\bbuys?\b|to buy|bid for|tender offer|take-private|förvärv|uppköp|köper|köpt|\bbud\b|budplikt|erbjudande|fusion|övertag|säljer|avyttr|sålt/i;
 
-const SYSTEM = `Du är en senior M&A-analytiker. Du får en nyhetsrubrik (och ev. ingress). Avgör om det handlar om en NY, konkret M&A-affär (förvärv, fusion, uppköpsbud, buyout).
+const SYSTEM = `Du är en senior M&A-analytiker. Du får en nyhetsrubrik och ingress, och ibland hela artikeltexten. Avgör om det handlar om en NY, konkret M&A-affär (förvärv, fusion, uppköpsbud, buyout).
 Regler:
 - is_deal=false för analyser, åsiktstexter, gamla affärer eller icke-M&A.
 - value_usd_bn: affärsvärde i miljarder USD, endast om det står i texten (eller är en tydlig omräkning av ett angivet belopp), annars null.
@@ -52,6 +53,7 @@ Regler:
 - swedish: true om köparen ELLER målbolaget är ett svenskt bolag (eller huvudsakligen svenskägt/noterat i Sverige).
 - summary: 2-3 meningar på svenska (vad, pris, motiv).
 - acquirer_reason / target_reason: 1 mening vardera på svenska. Bedöm om affären är bra eller dålig FÖR respektive bolag (pris/premie, strategisk logik, risk, skuldsättning).
+- analysis: fördjupad analys på svenska, 5-8 meningar, endast om is_deal=true (annars tom sträng). Gå igenom det som står i texten: pris och ev. premie, finansiering, tidplan, villkor/godkännanden, strategiskt motiv och huvudsakliga risker. Finns bara rubrik och ingress, skriv kortare och säg uttryckligen vad som är okänt. Skriv aldrig uppgifter som inte stöds av texten.
 - importance: heltal 1-5, där 5 är megaaffär med marknadspåverkan.
 - acquirer / target: bolagets vanliga namn utan juridisk form. Om köparen inte nämns, sätt acquirer till null (skriv aldrig "okänd" eller "ospecificerad").
 - Hitta aldrig på siffror som inte finns i texten. Detta är inte finansiell rådgivning.`;
@@ -68,6 +70,7 @@ const SCHEMA = {
     sector: { type: 'STRING', nullable: true },
     status: { type: 'STRING', enum: ['announced', 'rumor', 'completed', 'rejected', 'other'] },
     summary: { type: 'STRING' },
+    analysis: { type: 'STRING' },
     acquirer_verdict: { type: 'STRING', enum: ['good', 'neutral', 'bad'] },
     acquirer_reason: { type: 'STRING' },
     target_verdict: { type: 'STRING', enum: ['good', 'neutral', 'bad'] },
@@ -84,7 +87,7 @@ async function analyze(item) {
       headers: { 'x-goog-api-key': GEMINI_API_KEY, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: SYSTEM }] },
-        contents: [{ role: 'user', parts: [{ text: `Rubrik: ${item.title}\nKälla: ${item.source}\nIngress: ${item.snippet || '-'}` }] }],
+        contents: [{ role: 'user', parts: [{ text: `Rubrik: ${item.title}\nKälla: ${item.source}\nIngress: ${item.snippet || '-'}${item.article ? `\n\nHela artikeltexten:\n${item.article.text}` : ''}` }] }],
         generationConfig: { responseMimeType: 'application/json', responseSchema: SCHEMA, temperature: 0.2 },
       }),
     });
@@ -175,12 +178,13 @@ async function main() {
   let added = 0;
   for (const it of fresh) {
     try {
+      it.article = await readArticle(it.link); // null vid betalvägg/fel, då analyseras bara rubrik och ingress
       const a = await analyze(it);
       await sleep(4500); // håll oss under gratisgränsen för anrop/minut
       if (!a?.is_deal || a.status === 'other') continue;
       if (isDup(a, recent)) { console.log(`Dubblett hoppas över: ${a.acquirer} -> ${a.target}`); continue; }
       const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
-      const data = { id, ...a, link: it.link, source: it.source, headline: it.title, date: it.date };
+      const data = { id, ...a, link: it.article?.url || it.link, full_text: !!it.article, source: it.source, headline: it.title, date: it.date };
       const dk = `${a.acquirer}|${a.target}`.toLowerCase();
       const inserted = await rpc('ma_insert_deal', { secret: INGEST_SECRET, p_id: id, p_key: dk, p_importance: a.importance, p_data: data });
       if (!inserted) continue;

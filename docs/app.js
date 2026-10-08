@@ -26,6 +26,7 @@ function render() {
         <div class="v ${esc(d.acquirer_verdict)}"><b>Köpare: ${esc(d.acquirer)}</b><span class="t">${LABEL[d.acquirer_verdict] || ''}</span> – ${esc(d.acquirer_reason)}</div>
         <div class="v ${esc(d.target_verdict)}"><b>Mål: ${esc(d.target)}</b><span class="t">${LABEL[d.target_verdict] || ''}</span> – ${esc(d.target_reason)}</div>
       </div>
+      ${d.analysis ? `<details class="deep"><summary>Fördjupad analys <span class="src">${d.full_text ? '· hela artikeln' : '· rubrik och ingress'}</span></summary><p>${esc(d.analysis)}</p></details>` : ''}
       ${d.link ? `<p style="margin:10px 0 0"><a href="${esc(d.link)}" target="_blank" rel="noopener">Läs artikeln →</a></p>` : ''}
     </article>`).join('') : '<div class="empty">Inga affärer ännu – nya dyker upp automatiskt.</div>';
 }
