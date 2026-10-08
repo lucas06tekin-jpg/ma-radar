@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="M&A Radar">
+<meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>M&A Radar</title>
+<style>
+  :root { --bg:#0f172a; --card:#1e293b; --text:#e2e8f0; --muted:#94a3b8; --line:#334155;
+          --good:#34d399; --neutral:#fbbf24; --bad:#f87171; --accent:#38bdf8; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+         font:16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+  header { position:sticky; top:0; z-index:5; background:rgba(15,23,42,.92); backdrop-filter:blur(10px);
+           padding:14px 16px 10px; border-bottom:1px solid var(--line); }
+  h1 { margin:0; font-size:22px; display:flex; justify-content:space-between; align-items:center; }
+  #bell { background:none; border:1px solid var(--line); color:var(--text); border-radius:20px; padding:6px 12px; font-size:14px; }
+  #bell.on { border-color:var(--good); color:var(--good); }
+  .filters { display:flex; gap:8px; margin-top:10px; overflow-x:auto; }
+  .chip { flex:none; background:var(--card); border:1px solid var(--line); color:var(--muted); border-radius:16px; padding:5px 12px; font-size:13px; }
+  .chip.active { color:var(--bg); background:var(--accent); border-color:var(--accent); }
+  main { padding:12px 16px 40px; max-width:720px; margin:0 auto; }
+  .banner { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin-bottom:12px; font-size:14px; color:var(--muted); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px; }
+  .card.hl { border-color:var(--accent); }
+  .top { display:flex; justify-content:space-between; gap:8px; align-items:baseline; }
+  .names { font-weight:700; font-size:17px; }
+  .val { color:var(--accent); font-weight:600; white-space:nowrap; }
+  .meta { color:var(--muted); font-size:12px; margin:2px 0 8px; }
+  .sum { margin:0 0 10px; }
+  .verdicts { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .v { border-radius:10px; padding:8px; background:rgba(255,255,255,.04); font-size:13px; border-left:4px solid var(--neutral); }
+  .v.good { border-color:var(--good); } .v.bad { border-color:var(--bad); }
+  .v b { display:block; font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+  .v .t { font-weight:700; }
+  .v.good .t { color:var(--good); } .v.bad .t { color:var(--bad); } .v.neutral .t { color:var(--neutral); }
+  a { color:var(--accent); font-size:13px; }
+  .empty { text-align:center; color:var(--muted); padding:40px 0; }
+  footer { text-align:center; color:var(--muted); font-size:11px; padding:0 16px 20px; }
+  @media (max-width:420px){ .verdicts{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<header>
+  <h1>M&amp;A Radar <button id="bell">🔔 Notiser</button></h1>
+  <div class="filters" id="filters">
+    <button class="chip active" data-min="1">Alla</button>
+    <button class="chip" data-min="3">Viktiga</button>
+    <button class="chip" data-min="5">Megaaffärer</button>
+  </div>
+</header>
+<main>
+  <div id="banner"></div>
+  <div id="list"><div class="empty">Laddar affärer…</div></div>
+</main>
+<footer>AI-genererade sammanfattningar och bedömningar – inte finansiell rådgivning.</footer>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

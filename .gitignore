@@ -1,0 +1,4 @@
+node_modules
+.vapid.json
+.ingest-secret
+.env
