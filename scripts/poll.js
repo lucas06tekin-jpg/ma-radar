@@ -39,8 +39,10 @@ const FEEDS = [
   gnSv('förvärvar OR köper OR uppköp OR "bud på" bolag miljarder'),
   gnSv('budpliktsbud OR "offentligt erbjudande" OR "lägger bud" OR fusion'),
   gnSv('private equity köper svenskt bolag förvärv'),
+  gnSv('säljer OR avyttrar affärsområde OR dotterbolag miljarder'),
+  gnSv('Affärsvärlden OR Dagens Industri OR Placera OR Börsvärlden uppköp förvärv bud'),
 ];
-const KEYWORDS = /acqui|merger|merge|takeover|buyout|\bbuys?\b|to buy|bid for|tender offer|take-private|förvärv|uppköp|köper|köpt|\bbud\b|budplikt|erbjudande|fusion|övertag/i;
+const KEYWORDS = /acqui|merger|merge|takeover|buyout|\bbuys?\b|to buy|bid for|tender offer|take-private|förvärv|uppköp|köper|köpt|\bbud\b|budplikt|erbjudande|fusion|övertag|säljer|avyttr|sålt/i;
 
 const SYSTEM = `Du är en senior M&A-analytiker. Du får en nyhetsrubrik (och ev. ingress). Avgör om det handlar om en NY, konkret M&A-affär (förvärv, fusion, uppköpsbud, buyout).
 Regler:
