@@ -53,6 +53,7 @@ Regler:
 - summary: 2-3 meningar på svenska (vad, pris, motiv).
 - acquirer_reason / target_reason: 1 mening vardera på svenska. Bedöm om affären är bra eller dålig FÖR respektive bolag (pris/premie, strategisk logik, risk, skuldsättning).
 - importance: heltal 1-5, där 5 är megaaffär med marknadspåverkan.
+- acquirer / target: bolagets vanliga namn utan juridisk form. Om köparen inte nämns, sätt acquirer till null (skriv aldrig "okänd" eller "ospecificerad").
 - Hitta aldrig på siffror som inte finns i texten. Detta är inte finansiell rådgivning.`;
 
 const SCHEMA = {
@@ -118,6 +119,24 @@ async function pushAll(deal, subs) {
 
 const keyOf = (t) => t.toLowerCase().replace(/[^a-z0-9 ]/g, '').slice(0, 60);
 
+// ---------- dubblettkontroll ----------
+const STOP = new Set(['inc', 'corp', 'corporation', 'co', 'company', 'ltd', 'plc', 'ab', 'asa', 'oyj', 'group', 'holding', 'holdings', 'the', 'and', 'of', 'as', 'sa', 'nv', 'ag', 'gmbh', 'llc', 'lp', 'publ']);
+const tokens = (n) => new Set(
+  String(n || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^\p{L}\p{N} ]/gu, ' ')
+    .split(/\s+/).filter((t) => t && !STOP.has(t)),
+);
+const unknown = (n) => !n || tokens(n).size === 0 || /ospecificerad|okänd|unknown|undisclosed|unnamed/i.test(n);
+// "Paramount" och "Paramount Skydance" räknas som samma bolag: alla ord i det kortare namnet finns i det längre.
+const sameName = (x, y) => {
+  const a = tokens(x), b = tokens(y);
+  if (!a.size || !b.size) return false;
+  const [s, l] = a.size <= b.size ? [a, b] : [b, a];
+  return [...s].every((t) => l.has(t));
+};
+// Samma affär = samma målbolag och (samma köpare eller okänd köpare). Olika köpare = konkurrerande bud, behålls.
+const isDup = (a, list) => list.some((d) =>
+  sameName(a.target, d.target) && (unknown(a.acquirer) || unknown(d.acquirer) || sameName(a.acquirer, d.acquirer)));
+
 async function main() {
   const existing = await sb('ma_deals?select=id&limit=1');
   const firstRun = existing.length === 0; // första körningen fyller listan utan att skicka notiser
@@ -150,6 +169,7 @@ async function main() {
   console.log(`${items.length} artiklar, ${cands.length} kandidater, ${fresh.length} nya att analysera`);
   if (!fresh.length) return;
 
+  const recent = (await sb('ma_deals?select=data&order=created_at.desc&limit=150')).map((r) => r.data);
   const subs = firstRun ? [] : await rpc('ma_get_subs', { secret: INGEST_SECRET });
   const deadAll = [];
   let added = 0;
@@ -158,11 +178,13 @@ async function main() {
       const a = await analyze(it);
       await sleep(4500); // håll oss under gratisgränsen för anrop/minut
       if (!a?.is_deal || a.status === 'other') continue;
+      if (isDup(a, recent)) { console.log(`Dubblett hoppas över: ${a.acquirer} -> ${a.target}`); continue; }
       const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
       const data = { id, ...a, link: it.link, source: it.source, headline: it.title, date: it.date };
       const dk = `${a.acquirer}|${a.target}`.toLowerCase();
       const inserted = await rpc('ma_insert_deal', { secret: INGEST_SECRET, p_id: id, p_key: dk, p_importance: a.importance, p_data: data });
       if (!inserted) continue;
+      recent.unshift(data);
       added++;
       if (subs.length) deadAll.push(...(await pushAll(data, subs)));
     } catch (e) { console.warn('Analysfel:', e.message); }
