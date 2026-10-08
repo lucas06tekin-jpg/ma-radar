@@ -3,6 +3,7 @@ const LABEL = { good: 'Bra', neutral: 'Neutralt', bad: 'Dåligt' };
 const STATUS = { announced: 'Tillkännagiven', rumor: 'Rykte', completed: 'Slutförd', rejected: 'Avvisad', other: '' };
 let deals = [];
 let minImp = 1;
+let onlySe = false;
 const focusId = new URLSearchParams(location.search).get('deal');
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -12,12 +13,12 @@ const ago = (d) => {
 };
 
 function render() {
-  const list = deals.filter((d) => (d.importance || 1) >= minImp);
+  const list = deals.filter((d) => (d.importance || 1) >= minImp && (!onlySe || d.swedish));
   $('#list').innerHTML = list.length ? list.map((d) => `
     <article class="card ${d.id === focusId ? 'hl' : ''}">
       <div class="top">
         <div class="names">${esc(d.acquirer)} → ${esc(d.target)}</div>
-        ${d.value_usd_bn ? `<div class="val">$${esc(d.value_usd_bn)} mdr</div>` : ''}
+        ${d.value_text || d.value_usd_bn ? `<div class="val">${d.value_text ? esc(d.value_text) : '$' + esc(d.value_usd_bn) + ' mdr'}</div>` : ''}
       </div>
       <div class="meta">${[STATUS[d.status], d.sector, ago(d.date), d.source].filter(Boolean).map(esc).join(' · ')}</div>
       <p class="sum">${esc(d.summary)}</p>
@@ -41,12 +42,17 @@ async function load() {
   render();
 }
 
-document.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => {
-  document.querySelectorAll('.chip').forEach((x) => x.classList.remove('active'));
+document.querySelectorAll('.chip[data-min]').forEach((c) => c.addEventListener('click', () => {
+  document.querySelectorAll('.chip[data-min]').forEach((x) => x.classList.remove('active'));
   c.classList.add('active');
   minImp = Number(c.dataset.min);
   render();
 }));
+$('#se').addEventListener('click', (e) => {
+  onlySe = !onlySe;
+  e.currentTarget.classList.toggle('active', onlySe);
+  render();
+});
 
 // ---------- push ----------
 const urlB64 = (b) => {

@@ -28,19 +28,26 @@ const sb = async (path, opts = {}) => {
 const rpc = (fn, args) => sb(`rpc/${fn}`, { method: 'POST', body: JSON.stringify(args) });
 
 const gn = (q) => `https://news.google.com/rss/search?q=${encodeURIComponent(q + ' when:1d')}&hl=en-US&gl=US&ceid=US:en`;
+const gnSv = (q) => `https://news.google.com/rss/search?q=${encodeURIComponent(q + ' when:1d')}&hl=sv&gl=SE&ceid=SE:sv`;
 const FEEDS = [
   gn('"to acquire" OR "agrees to buy" OR "takeover" billion'),
   gn('merger announced OR "definitive agreement" acquisition'),
   gn('"all-cash deal" OR "buyout" OR "tender offer"'),
   gn('private equity take-private deal'),
   gn('Reuters mergers acquisitions'),
+  gn('Swedish company acquires OR bid OR takeover Stockholm'),
+  gnSv('förvärvar OR köper OR uppköp OR "bud på" bolag miljarder'),
+  gnSv('budpliktsbud OR "offentligt erbjudande" OR "lägger bud" OR fusion'),
+  gnSv('private equity köper svenskt bolag förvärv'),
 ];
-const KEYWORDS = /acqui|merger|merge|takeover|buyout|\bbuys?\b|to buy|bid for|tender offer|take-private/i;
+const KEYWORDS = /acqui|merger|merge|takeover|buyout|\bbuys?\b|to buy|bid for|tender offer|take-private|förvärv|uppköp|köper|köpt|\bbud\b|budplikt|erbjudande|fusion|övertag/i;
 
 const SYSTEM = `Du är en senior M&A-analytiker. Du får en nyhetsrubrik (och ev. ingress). Avgör om det handlar om en NY, konkret M&A-affär (förvärv, fusion, uppköpsbud, buyout).
 Regler:
 - is_deal=false för analyser, åsiktstexter, gamla affärer eller icke-M&A.
-- value_usd_bn: affärsvärde i miljarder USD, endast om det står i texten, annars null.
+- value_usd_bn: affärsvärde i miljarder USD, endast om det står i texten (eller är en tydlig omräkning av ett angivet belopp), annars null.
+- value_text: värdet exakt i originalvalutan som det står i texten (t.ex. "4,5 mdkr" eller "£6,7 mdr"), annars null.
+- swedish: true om köparen ELLER målbolaget är ett svenskt bolag (eller huvudsakligen svenskägt/noterat i Sverige).
 - summary: 2-3 meningar på svenska (vad, pris, motiv).
 - acquirer_reason / target_reason: 1 mening vardera på svenska. Bedöm om affären är bra eller dålig FÖR respektive bolag (pris/premie, strategisk logik, risk, skuldsättning).
 - importance: heltal 1-5, där 5 är megaaffär med marknadspåverkan.
@@ -53,6 +60,8 @@ const SCHEMA = {
     acquirer: { type: 'STRING', nullable: true },
     target: { type: 'STRING', nullable: true },
     value_usd_bn: { type: 'NUMBER', nullable: true },
+    value_text: { type: 'STRING', nullable: true },
+    swedish: { type: 'BOOLEAN' },
     sector: { type: 'STRING', nullable: true },
     status: { type: 'STRING', enum: ['announced', 'rumor', 'completed', 'rejected', 'other'] },
     summary: { type: 'STRING' },
@@ -62,7 +71,7 @@ const SCHEMA = {
     target_reason: { type: 'STRING' },
     importance: { type: 'INTEGER' },
   },
-  required: ['is_deal', 'status', 'summary', 'acquirer_verdict', 'acquirer_reason', 'target_verdict', 'target_reason', 'importance'],
+  required: ['is_deal', 'swedish', 'status', 'summary', 'acquirer_verdict', 'acquirer_reason', 'target_verdict', 'target_reason', 'importance'],
 };
 
 async function analyze(item) {
@@ -88,7 +97,7 @@ async function analyze(item) {
 async function pushAll(deal, subs) {
   const icon = { good: '🟢', neutral: '🟡', bad: '🔴' };
   const payload = JSON.stringify({
-    title: `${deal.acquirer || '?'} → ${deal.target || '?'}${deal.value_usd_bn ? ` ($${deal.value_usd_bn} mdr)` : ''}`,
+    title: `${deal.acquirer || '?'} → ${deal.target || '?'}${deal.value_text ? ` (${deal.value_text})` : deal.value_usd_bn ? ` ($${deal.value_usd_bn} mdr)` : ''}`,
     body: `${icon[deal.acquirer_verdict] || ''} Köpare  ${icon[deal.target_verdict] || ''} Mål\n${deal.summary}`,
     url: `./?deal=${deal.id}`,
   });
