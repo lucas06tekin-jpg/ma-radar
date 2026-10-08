@@ -6,7 +6,7 @@ const {
   GEMINI_API_KEY, SUPABASE_URL, SUPABASE_KEY, INGEST_SECRET,
   VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY,
   VAPID_SUBJECT = 'mailto:lucas06.tekin@gmail.com',
-  GEMINI_MODEL = 'gemini-2.5-flash-lite',
+  GEMINI_MODEL = 'gemini-3.5-flash-lite',
   MAX_PER_RUN = '20',
 } = process.env;
 
