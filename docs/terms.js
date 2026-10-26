@@ -41,6 +41,7 @@
     get list() { return list; },
     subscribe: (fn) => subs.push(fn),
     refresh,
+    rpc,
     login: (pass) => rpc('ma_admin_login', { p_pass: pass }),
     save: (pass, t) => rpc('ma_term_save', { p_pass: pass, p_abbr: t.a, p_full: t.f, p_sv: t.s, p_cat: t.c }).then(async (r) => { if (r.ok) await refresh(); return r; }),
     remove: (pass, abbr) => rpc('ma_term_delete', { p_pass: pass, p_abbr: abbr }).then(async (r) => { if (r.ok) await refresh(); return r; }),

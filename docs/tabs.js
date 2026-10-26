@@ -1,6 +1,6 @@
 // Flikhantering: Affärer, Quiz och Ordlista. Varje flik har ett <main id="view-NAMN"> och en hash i adressen.
 (() => {
-  const VIEWS = { deals: '', quiz: '#quiz', glossary: '#ordlista' };
+  const VIEWS = { deals: '', quiz: '#quiz', glossary: '#ordlista', interview: '#intervju' };
 
   function show(view) {
     if (!(view in VIEWS)) view = 'deals';
@@ -10,6 +10,7 @@
     try { history.replaceState(null, '', VIEWS[view] || location.pathname + location.search); } catch {}
     if (view === 'quiz' && window.onQuizShow) window.onQuizShow();
     if (view === 'glossary' && window.onGlossaryShow) window.onGlossaryShow();
+    if (view === 'interview' && window.onInterviewShow) window.onInterviewShow();
     window.scrollTo(0, 0);
   }
 
