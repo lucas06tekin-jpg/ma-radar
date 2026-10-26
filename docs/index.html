@@ -50,7 +50,7 @@
   [hidden] { display:none !important; }
   .tabs { display:flex; gap:6px; margin-top:10px; overflow-x:auto; scrollbar-width:none; }
   .tabs::-webkit-scrollbar { display:none; }
-  .tab { flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:1px; white-space:nowrap; background:var(--card); border:1px solid var(--line); color:var(--muted); border-radius:10px; padding:6px 2px; font-size:12px; font-weight:600; line-height:1.2; }
+  .tab { flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:1px; white-space:nowrap; background:var(--card); border:1px solid var(--line); color:var(--muted); border-radius:10px; padding:6px 1px; font-size:11px; font-weight:600; line-height:1.2; }
   .tab span { font-size:18px; line-height:1.1; }
   .tab.active { color:var(--text); border-color:var(--accent); box-shadow:inset 0 -3px 0 var(--accent); }
 
@@ -115,6 +115,22 @@
   .gtools { display:flex; gap:16px; margin-top:4px; }
   .gtools .qlink { padding:6px 0 0; font-size:13px; }
   .qlink.danger { color:var(--bad); }
+  /* Nyheter */
+  .nfilters { margin-top:12px; }
+  .ncard { padding:12px; }
+  .nmeta { display:flex; flex-wrap:wrap; gap:6px 10px; align-items:center; font-size:12px; color:var(--muted); }
+  .nmeta b { color:var(--text); font-size:13px; }
+  .npill { padding:1px 8px; border-radius:10px; font-size:11px; font-weight:700; border:1px solid var(--line); }
+  .npill.paid { color:var(--neutral); border-color:var(--neutral); }
+  .npill.big { color:var(--bg); background:var(--bad); border-color:var(--bad); }
+  .npill.imp { color:var(--accent); border-color:var(--accent); }
+  .ntitle { display:block; margin:6px 0 4px; font-size:16px; font-weight:700; line-height:1.3; color:var(--text); text-decoration:none; }
+  .nsum { margin:0 0 6px; font-size:14px; color:var(--muted); }
+  .ntags { display:flex; flex-wrap:wrap; gap:6px; }
+  .ntags span { font-size:11px; padding:2px 8px; border-radius:10px; background:rgba(255,255,255,.06); color:var(--muted); }
+  .nnotehead { width:100%; display:flex; justify-content:space-between; align-items:center; padding:12px 14px; background:none; border:none; color:var(--text); font-size:15px; }
+  .nnotebody { padding:0 14px 14px; border-top:1px solid var(--line); }
+  .nchev { color:var(--muted); font-size:12px; }
   /* Quizpåminnelse */
   .rtimes { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .rtime { display:flex; align-items:center; gap:8px; }
@@ -143,6 +159,7 @@
   <h1>Din Finans App <button id="bell">🔔 Notiser</button></h1>
   <nav class="tabs">
     <button class="tab active" data-view="deals"><span>📰</span>Affärer</button>
+    <button class="tab" data-view="news"><span>📺</span>Nyheter</button>
     <button class="tab" data-view="quiz"><span>🧠</span>Quiz</button>
     <button class="tab" data-view="glossary"><span>📖</span>Ordlista</button>
     <button class="tab" data-view="interview"><span>🎤</span>Intervju</button>
@@ -158,6 +175,7 @@
   <div id="banner"></div>
   <div id="list"><div class="empty">Laddar affärer…</div></div>
 </main>
+<main id="view-news" hidden></main>
 <main id="view-quiz" hidden></main>
 <main id="view-glossary" hidden></main>
 <main id="view-interview" hidden></main>
@@ -166,6 +184,8 @@
 <script src="app.js"></script>
 <script src="quiz-data.js"></script>
 <script src="terms.js"></script>
+<script src="push.js"></script>
+<script src="news.js"></script>
 <script src="quiz.js"></script>
 <script src="reminder.js"></script>
 <script src="glossary.js"></script>

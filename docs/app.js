@@ -87,9 +87,9 @@ $('#bell').addEventListener('click', async () => {
     // Stäng av affärsnotiser. Själva prenumerationen behålls om en quizpåminnelse använder den.
     await rpc('ma_unsubscribe', { p_endpoint: existing.endpoint });
     setDealsFlag('0');
-    let reminderActive = false;
-    try { reminderActive = !!(await (await rpc('ma_reminder_get', { p_endpoint: existing.endpoint })).json()).enabled; } catch {}
-    if (!reminderActive) await existing.unsubscribe();
+    let inUse = false; // används prenumerationen av en quizpåminnelse eller nyhetsnotiser?
+    try { const u = await (await rpc('ma_push_uses', { p_endpoint: existing.endpoint })).json(); inUse = !!(u.reminder || u.news); } catch {}
+    if (!inUse) await existing.unsubscribe();
     return refreshBell();
   }
   if ((await Notification.requestPermission()) !== 'granted') return alert('Notiser nekades.');
