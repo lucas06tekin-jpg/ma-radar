@@ -88,7 +88,7 @@ $('#bell').addEventListener('click', async () => {
     await rpc('ma_unsubscribe', { p_endpoint: existing.endpoint });
     setDealsFlag('0');
     let inUse = false; // används prenumerationen av en quizpåminnelse eller nyhetsnotiser?
-    try { const u = await (await rpc('ma_push_uses', { p_endpoint: existing.endpoint })).json(); inUse = !!(u.reminder || u.news); } catch {}
+    try { const u = await (await rpc('ma_push_uses', { p_endpoint: existing.endpoint })).json(); inUse = !!(u.reminder || u.news || u.jobs); } catch {}
     if (!inUse) await existing.unsubscribe();
     return refreshBell();
   }

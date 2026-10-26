@@ -50,7 +50,7 @@
   [hidden] { display:none !important; }
   .tabs { display:flex; gap:6px; margin-top:10px; overflow-x:auto; scrollbar-width:none; }
   .tabs::-webkit-scrollbar { display:none; }
-  .tab { flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:1px; white-space:nowrap; background:var(--card); border:1px solid var(--line); color:var(--muted); border-radius:10px; padding:6px 1px; font-size:11px; font-weight:600; line-height:1.2; }
+  .tab { flex:1 1 0; min-width:54px; display:flex; flex-direction:column; align-items:center; gap:1px; white-space:nowrap; background:var(--card); border:1px solid var(--line); color:var(--muted); border-radius:10px; padding:6px 1px; font-size:11px; font-weight:600; line-height:1.2; }
   .tab span { font-size:18px; line-height:1.1; }
   .tab.active { color:var(--text); border-color:var(--accent); box-shadow:inset 0 -3px 0 var(--accent); }
 
@@ -131,6 +131,14 @@
   .nnotehead { width:100%; display:flex; justify-content:space-between; align-items:center; padding:12px 14px; background:none; border:none; color:var(--text); font-size:15px; }
   .nnotebody { padding:0 14px 14px; border-top:1px solid var(--line); }
   .nchev { color:var(--muted); font-size:12px; }
+  /* Jobb */
+  .jrow { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+  .jrow select { min-height:46px; padding:8px 10px; font-size:15px; }
+  .jurgent { color:var(--bad) !important; }
+  .jlinks { display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:8px; }
+  .jlinks a { font-size:13px; }
+  .jcareerlinks { display:flex; flex-wrap:wrap; gap:8px; }
+  .jcareerlinks a { padding:6px 12px; border:1px solid var(--line); border-radius:16px; font-size:13px; color:var(--text); text-decoration:none; background:var(--card); }
   /* Quizpåminnelse */
   .rtimes { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .rtime { display:flex; align-items:center; gap:8px; }
@@ -160,6 +168,7 @@
   <nav class="tabs">
     <button class="tab active" data-view="deals"><span>📰</span>Affärer</button>
     <button class="tab" data-view="news"><span>📺</span>Nyheter</button>
+    <button class="tab" data-view="jobs"><span>💼</span>Jobb</button>
     <button class="tab" data-view="quiz"><span>🧠</span>Quiz</button>
     <button class="tab" data-view="glossary"><span>📖</span>Ordlista</button>
     <button class="tab" data-view="interview"><span>🎤</span>Intervju</button>
@@ -176,6 +185,7 @@
   <div id="list"><div class="empty">Laddar affärer…</div></div>
 </main>
 <main id="view-news" hidden></main>
+<main id="view-jobs" hidden></main>
 <main id="view-quiz" hidden></main>
 <main id="view-glossary" hidden></main>
 <main id="view-interview" hidden></main>
@@ -186,6 +196,7 @@
 <script src="terms.js"></script>
 <script src="push.js"></script>
 <script src="news.js"></script>
+<script src="jobs.js"></script>
 <script src="quiz.js"></script>
 <script src="reminder.js"></script>
 <script src="glossary.js"></script>
