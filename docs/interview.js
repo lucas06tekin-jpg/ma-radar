@@ -151,7 +151,7 @@
       <div class="qprog"><span>Fråga ${round.i + 1} av ${round.qs.length}</span><span>${Object.keys(round.results).length} betygsatta</span></div>
       <div class="qbar"><i style="width:${(round.i / round.qs.length) * 100}%"></i></div>
       <div class="card qcard" style="padding:14px">
-        <div class="iqsec">${esc(GROUPS[q.grp])} · ${esc(q.section)}</div>
+        <div class="iqsec">${esc(GROUPS[q.grp])} · ${esc(q.section)} · fråga ${q.n}</div>
         <div class="iqq">${esc(q.q)}</div>
         ${prev && prev.rating ? `<p class="iqprev">Förra gången: ${esc(RATE[prev.rating])}${prev.answer ? ' · du svarade: ' + esc(prev.answer.length > 160 ? prev.answer.slice(0, 160) + '…' : prev.answer) : ''}</p>` : ''}
         <textarea id="ians" class="qinput iqarea" placeholder="Skriv ditt svar här, som om du svarade i intervjun…" maxlength="8000"
