@@ -74,6 +74,7 @@ $('#bell').addEventListener('click', async () => {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     return alert('Notiser stöds inte här. På iPhone: öppna i Safari → Dela → "Lägg till på hemskärmen" och öppna appen därifrån (iOS 16.4+).');
   }
+  if (!reg) return alert('Notistjänsten startade inte. Ladda om appen och försök igen.');
   const existing = await reg.pushManager.getSubscription();
   if (existing) {
     await rpc('ma_unsubscribe', { p_endpoint: existing.endpoint });
@@ -92,10 +93,12 @@ $('#bell').addEventListener('click', async () => {
   if (/iPhone|iPad/.test(navigator.userAgent) && !standalone) {
     $('#banner').innerHTML = '<div class="banner">📲 För notiser: tryck <b>Dela</b> i Safari → <b>Lägg till på hemskärmen</b>, öppna sedan appen därifrån och tryck på 🔔.</div>';
   }
-  if ('serviceWorker' in navigator) {
-    reg = await navigator.serviceWorker.register('sw.js');
-    refreshBell();
-  }
-  load();
+  load(); // affärerna ska laddas även om service workern inte går att registrera
   setInterval(load, 60000);
+  if ('serviceWorker' in navigator) {
+    try {
+      reg = await navigator.serviceWorker.register('sw.js');
+      refreshBell();
+    } catch (e) { console.warn('Service worker kunde inte registreras:', e.message); }
+  }
 })();

@@ -47,12 +47,56 @@
   a { color:var(--accent); font-size:13px; }
   .empty { text-align:center; color:var(--muted); padding:40px 0; }
   footer { text-align:center; color:var(--muted); font-size:11px; padding:0 16px 20px; }
-  @media (max-width:420px){ .verdicts{grid-template-columns:1fr;} }
+  [hidden] { display:none !important; }
+  .tabs { display:flex; gap:6px; margin-top:10px; }
+  .tab { flex:1; background:var(--card); border:1px solid var(--line); color:var(--muted); border-radius:10px; padding:8px 0; font-size:15px; font-weight:600; }
+  .tab.active { color:var(--text); border-color:var(--accent); box-shadow:inset 0 -3px 0 var(--accent); }
+
+  /* Quiz */
+  .qh { margin:0 0 4px; font-size:22px; }
+  .qsub { margin:0 0 14px; color:var(--muted); font-size:14px; }
+  .qstats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+  .qstats div { background:rgba(255,255,255,.04); border-radius:10px; padding:10px 6px; text-align:center; }
+  .qstats b { display:block; font-size:22px; color:var(--accent); }
+  .qstats span { font-size:11px; color:var(--muted); }
+  .qlabel { margin:12px 0 6px; font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  .qchips { display:flex; flex-wrap:wrap; gap:8px; }
+  .qbtn { display:block; width:100%; margin-top:14px; min-height:50px; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--text); font-size:16px; font-weight:600; }
+  .qbtn.primary { background:var(--accent); border-color:var(--accent); color:var(--bg); }
+  .qbtn.ghost { background:none; color:var(--muted); font-weight:400; font-size:14px; min-height:40px; }
+  .qbtn:disabled { opacity:.5; }
+  .qprog { display:flex; justify-content:space-between; font-size:13px; color:var(--muted); margin-bottom:6px; }
+  .qbar { height:6px; background:var(--card); border-radius:3px; overflow:hidden; margin-bottom:12px; }
+  .qbar i { display:block; height:100%; background:var(--accent); transition:width .3s; }
+  .qcard { padding:18px 14px; }
+  .qcat { text-align:center; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+  .qabbr { text-align:center; font-size:44px; font-weight:800; letter-spacing:.02em; margin:6px 0 2px; word-break:break-word; }
+  .qask { text-align:center; color:var(--muted); margin-bottom:14px; font-size:14px; }
+  .qopts { display:grid; gap:10px; }
+  .qopt { text-align:left; min-height:54px; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--text); font-size:16px; line-height:1.3; }
+  .qopt:active:not(:disabled) { border-color:var(--accent); }
+  .qopt.right { border-color:var(--good); background:rgba(52,211,153,.15); }
+  .qopt.wrong { border-color:var(--bad); background:rgba(248,113,113,.15); }
+  .qopt:disabled { color:var(--text); }
+  .qfb { margin-top:14px; border-radius:12px; padding:12px; background:rgba(255,255,255,.04); border-left:4px solid var(--good); }
+  .qfb.no { border-color:var(--bad); }
+  .qfull { font-weight:700; margin-top:4px; }
+  .qfb p { margin:6px 0 0; font-size:14px; }
+  .qwrongnote { color:var(--muted); }
+  .qwrongnote span { opacity:.8; }
+  .qmiss { padding:10px 0; border-top:1px solid var(--line); font-size:14px; }
+  .qmiss b { color:var(--accent); margin-right:6px; }
+  .qmiss span { display:block; color:var(--muted); font-size:13px; margin-top:2px; }
+  @media (max-width:420px){ .verdicts{grid-template-columns:1fr;} .qabbr{font-size:38px;} }
 </style>
 </head>
 <body>
 <header>
   <h1>M&amp;A Radar <button id="bell">🔔 Notiser</button></h1>
+  <nav class="tabs">
+    <button class="tab active" data-view="deals">📰 Affärer</button>
+    <button class="tab" data-view="quiz">🧠 Quiz</button>
+  </nav>
   <div class="filters" id="filters">
     <button class="chip active" data-min="1">Alla</button>
     <button class="chip" data-min="3">Viktiga</button>
@@ -60,12 +104,15 @@
     <button class="chip" id="se">🇸🇪 Sverige</button>
   </div>
 </header>
-<main>
+<main id="view-deals">
   <div id="banner"></div>
   <div id="list"><div class="empty">Laddar affärer…</div></div>
 </main>
+<main id="view-quiz" hidden></main>
 <footer>AI-genererade sammanfattningar och bedömningar – inte finansiell rådgivning.</footer>
 <script src="config.js"></script>
 <script src="app.js"></script>
+<script src="quiz-data.js"></script>
+<script src="quiz.js"></script>
 </body>
 </html>
