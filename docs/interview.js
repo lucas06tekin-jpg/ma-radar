@@ -63,11 +63,11 @@
     root().innerHTML = `
       <div class="card">
         <h2 class="qh">Intervjuträning</h2>
-        <p class="qsub">Öva på intervjufrågor för investment banking. Du svarar med egna ord, ser facit och betygsätter dig själv. Innehållet är privat och kräver lösenordet.</p>
+        <p class="qsub">Öva på intervjufrågor för investment banking. Du svarar med egna ord, ser facit och betygsätter dig själv. Innehållet ur boken är privat, så första gången på en enhet behövs lösenordet.</p>
         ${flash ? `<div class="gflash">${esc(flash)}</div>` : ''}
         <form id="igate" class="gpanel" autocomplete="off" style="border-color:var(--line)">
           <input id="ipass" class="qinput" type="password" placeholder="Lösenord" aria-label="Lösenord" autocomplete="current-password">
-          <label class="gremember"><input type="checkbox" id="ikeep"> Kom ihåg på den här enheten</label>
+          <label class="gremember"><input type="checkbox" id="ikeep" checked> Kom ihåg på den här enheten (du skriver det bara en gång)</label>
           <button class="qbtn primary" type="submit">Lås upp</button>
         </form>
       </div>`;
