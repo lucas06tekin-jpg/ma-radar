@@ -28,6 +28,15 @@
   const f = { level: 'stud', cat: 'all', region: '', sort: 'new' };
   const note = { loaded: false, busy: false, endpoint: null, server: { exists: false }, levels: STUDENT.slice(), cats: Object.keys(CATS), region: '', msg: '', open: false };
   let careerOpen = false;
+  let segFn = () => {};
+  // Bokmärket i en annan webbläsare öppnar appen med ?addurl=...&addtitle=...
+  try {
+    const qs = new URLSearchParams(location.search);
+    if (qs.get('addurl')) {
+      window.__pendingAdd = { url: qs.get('addurl'), title: qs.get('addtitle') || '' };
+      history.replaceState(null, '', location.pathname + location.hash);
+    }
+  } catch {}
 
   const ago = (d) => {
     const m = Math.max(1, Math.round((Date.now() - new Date(d)) / 60000));
@@ -77,6 +86,7 @@
     el.innerHTML = list.length ? list.map((j) => {
       const dl = j.deadline ? daysLeft(j.deadline) : null;
       const fresh = Date.now() - new Date(j.published) < 24 * 3600e3;
+      const saved = window.Tracker && window.Tracker.isSaved(j.id);
       return `<article class="card ncard">
         <div class="nmeta">
           <b>${esc(j.employer || 'Okänd arbetsgivare')}</b>
@@ -89,7 +99,7 @@
         ${j.snippet ? `<p class="nsum">${esc(j.snippet.length > 180 ? j.snippet.slice(0, 180) + '…' : j.snippet)}</p>` : ''}
         <div class="ntags"><span>${esc(CATS[j.category])}</span>${j.occupation ? `<span>${esc(j.occupation)}</span>` : ''}
           ${j.deadline ? `<span class="${dl <= 7 ? 'jurgent' : ''}">Sista ansökan ${esc(fmtDate(j.deadline))}${dl >= 0 ? ` (${dl === 0 ? 'idag' : dl === 1 ? 'imorgon' : 'om ' + dl + ' d'})` : ''}</span>` : ''}</div>
-        <div class="jlinks"><a href="${esc(j.url)}" target="_blank" rel="noopener">Öppna annons →</a>${j.apply_url ? `<a href="${esc(j.apply_url)}" target="_blank" rel="noopener">Ansök hos arbetsgivaren →</a>` : ''}</div>
+        <div class="jlinks"><a href="${esc(j.url)}" target="_blank" rel="noopener">Öppna annons →</a>${j.apply_url ? `<a href="${esc(j.apply_url)}" target="_blank" rel="noopener">Ansök hos arbetsgivaren →</a>` : ''}<button class="jstar ${saved ? 'on' : ''}" data-save="${esc(j.id)}">${saved ? '⭐ Sparad' : '☆ Spara'}</button></div>
       </article>`;
     }).join('')
       : `<div class="empty">Inga jobb i det här urvalet.${f.level === 'stud' ? ' De flesta annonser kräver erfarenhet, så prova <b>Alla nivåer</b> eller en annan region.' : ''}</div>`;
@@ -183,6 +193,8 @@
   // ---------- uppbyggnad ----------
   function build() {
     root().innerHTML = `
+      <div class="qchips tseg" id="jseg"><button class="chip active" data-v="find">🔎 Hitta jobb</button><button class="chip" data-v="track">📋 Min spårare</button></div>
+      <div id="jfind">
       <div class="card" id="jnote" style="padding:0"></div>
       <div class="card" id="jcareer" style="padding:0"></div>
       <div class="qlabel">Nivå</div>
@@ -202,17 +214,38 @@
         <select id="jsort" class="qinput" aria-label="Sortera"><option value="new">Nyast först</option><option value="deadline">Sista ansökan först</option></select></div>
       <div class="gcount" id="jcount" style="margin:8px 0 6px"></div>
       <div id="jlist"></div>
-      <p class="iqnote">Annonserna kommer från Arbetsförmedlingens öppna jobbdata. Nivå (praktik, trainee, junior) och område gissas av appen utifrån rubrik och beskrivning, så dubbelkolla alltid i annonsen. Alla jobb visas oavsett om du är student eller inte, och utländska arbetsgivare och direktrekryteringar syns inte här.</p>`;
+      <p class="iqnote">Annonserna kommer från Arbetsförmedlingens öppna jobbdata. Nivå (praktik, trainee, junior) och område gissas av appen utifrån rubrik och beskrivning, så dubbelkolla alltid i annonsen. Alla jobb visas oavsett om du är student eller inte, och utländska arbetsgivare och direktrekryteringar syns inte här.</p>
+      </div>
+      <div id="jtrack" hidden></div>`;
     const chips = (id, key) => { $(id).onclick = (e) => { const b = e.target.closest('[data-v]'); if (!b) return; f[key] = b.dataset.v; document.querySelectorAll(id + ' .chip').forEach((c) => c.classList.toggle('active', c === b)); renderList(); }; };
     chips('#jlevel', 'level'); chips('#jcat', 'cat');
     $('#jregion').onchange = (e) => { f.region = e.target.value; renderList(); };
     $('#jsort').onchange = (e) => { f.sort = e.target.value; renderList(); };
+    segFn = (v) => {
+      document.querySelectorAll('#jseg .chip').forEach((c) => c.classList.toggle('active', c.dataset.v === v));
+      $('#jfind').hidden = v !== 'find';
+      $('#jtrack').hidden = v !== 'track';
+      if (v === 'track') window.Tracker.mount($('#jtrack'));
+    };
+    $('#jseg').onclick = (e) => { const b = e.target.closest('[data-v]'); if (b) segFn(b.dataset.v); };
+    $('#jlist').onclick = async (e) => {
+      const b = e.target.closest('[data-save]');
+      if (!b) return;
+      const job = items.find((x) => x.id === b.dataset.save);
+      if (!job) return;
+      b.disabled = true;
+      const r = await window.Tracker.saveFromFeed(job);
+      if (r === 'locked') segFn('track'); // spåraren är låst: lås upp, så sparas jobbet direkt efteråt
+      else renderList();
+    };
+    window.Tracker.onChange(renderList);
     renderNote(); renderCareer(); fillRegions(); renderList();
   }
 
   let timer = null;
   window.onJobsShow = () => {
     if (!built) { built = true; build(); }
+    if (window.__pendingAdd) { const p = window.__pendingAdd; window.__pendingAdd = null; segFn('track'); window.Tracker.openAdd(p); }
     loadItems();
     if (!note.loaded) loadNoteState();
     clearInterval(timer);

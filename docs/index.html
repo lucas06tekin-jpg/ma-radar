@@ -139,6 +139,28 @@
   .jlinks a { font-size:13px; }
   .jcareerlinks { display:flex; flex-wrap:wrap; gap:8px; }
   .jcareerlinks a { padding:6px 12px; border:1px solid var(--line); border-radius:16px; font-size:13px; color:var(--text); text-decoration:none; background:var(--card); }
+  /* Jobbspårare */
+  .tseg { margin-bottom:12px; }
+  .tseg .chip { flex:1; text-align:center; padding:9px 6px; font-size:14px; }
+  .jstar { background:none; border:1px solid var(--line); color:var(--text); border-radius:14px; padding:3px 12px; font-size:13px; }
+  .jstar.on { border-color:var(--neutral); color:var(--neutral); }
+  .tbar { display:flex; gap:8px; margin-bottom:10px; }
+  .tcard { border-left:4px solid var(--line); }
+  .tcard.s-saved { border-left-color:var(--accent); }
+  .tcard.s-applied { border-left-color:var(--neutral); }
+  .tcard.s-interview { border-left-color:#c084fc; }
+  .tcard.s-offer { border-left-color:var(--good); }
+  .tcard.s-rejected, .tcard.s-withdrawn { border-left-color:var(--bad); opacity:.8; }
+  .tchips { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; }
+  .tchip { font-size:12px; padding:2px 9px; border-radius:10px; background:rgba(255,255,255,.06); color:var(--muted); }
+  .tchip.urgent { background:rgba(248,113,113,.15); color:var(--bad); }
+  .tnotes { white-space:pre-wrap; }
+  .trow { display:flex; align-items:center; gap:14px; margin-top:6px; }
+  .tstatus { width:auto; min-height:38px; padding:4px 8px; font-size:14px; flex:none; }
+  .tlinkrow { display:flex; gap:8px; align-items:center; }
+  .tlinkrow .qinput { flex:1; min-width:0; }
+  .tlabel { display:grid; gap:4px; font-size:12px; color:var(--muted); }
+  .tlabel .qinput { min-height:46px; }
   /* Quizpåminnelse */
   .rtimes { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .rtime { display:flex; align-items:center; gap:8px; }
@@ -196,6 +218,7 @@
 <script src="terms.js"></script>
 <script src="push.js"></script>
 <script src="news.js"></script>
+<script src="tracker.js"></script>
 <script src="jobs.js"></script>
 <script src="quiz.js"></script>
 <script src="reminder.js"></script>
