@@ -3,7 +3,7 @@
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const ROUND = 10;
-  const ALL = window.QUIZ_DATA.map(([a, f, s, c]) => ({ a, f, s, c }));
+  let ALL = window.Terms.list; // delas med ordlistan och uppdateras när listan ändras
   const CATS = window.QUIZ_CATS;
 
   // ---------- lagring (bara i den här webbläsaren) ----------
@@ -247,4 +247,10 @@
 
   // Anropas av flikhanteraren (tabs.js) när Quiz-fliken öppnas
   window.onQuizShow = () => { if (!round) renderHome(); };
+
+  // När förkortningar läggs till eller tas bort byter quizet till den nya listan (en pågående omgång påverkas inte).
+  window.Terms.subscribe((list) => {
+    ALL = list;
+    if (!round && !$('#view-quiz').hidden) renderHome();
+  });
 })();

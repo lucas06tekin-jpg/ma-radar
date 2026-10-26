@@ -103,6 +103,16 @@
   .gcat { font-size:11px; color:var(--muted); text-align:right; }
   .gfull { font-weight:600; margin-top:2px; }
   .gexp { margin:4px 0 0; font-size:14px; color:var(--muted); }
+  .grow { display:flex; justify-content:space-between; align-items:center; }
+  .gbar { display:flex; gap:8px; margin:6px 0 8px; }
+  .gpanel { background:var(--card); border:1px solid var(--accent); border-radius:14px; padding:12px; margin:8px 0 12px; display:grid; gap:10px; }
+  .gpanel .qbtn { margin-top:0; }
+  .gpanel textarea.qinput { resize:vertical; font-family:inherit; }
+  .gremember { font-size:13px; color:var(--muted); display:flex; align-items:center; gap:8px; }
+  .gflash { background:rgba(56,189,248,.12); border:1px solid var(--accent); border-radius:10px; padding:8px 12px; margin:8px 0; font-size:14px; }
+  .gtools { display:flex; gap:16px; margin-top:4px; }
+  .gtools .qlink { padding:6px 0 0; font-size:13px; }
+  .qlink.danger { color:var(--bad); }
   @media (max-width:420px){ .verdicts{grid-template-columns:1fr;} .qabbr{font-size:38px;} }
 </style>
 </head>
@@ -131,6 +141,7 @@
 <script src="config.js"></script>
 <script src="app.js"></script>
 <script src="quiz-data.js"></script>
+<script src="terms.js"></script>
 <script src="quiz.js"></script>
 <script src="glossary.js"></script>
 <script src="tabs.js"></script>
