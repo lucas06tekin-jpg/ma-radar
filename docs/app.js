@@ -64,10 +64,17 @@ const urlB64 = (b) => {
 const standalone = window.navigator.standalone || matchMedia('(display-mode: standalone)').matches;
 let reg;
 
+// Telefonen har en enda notisprenumeration som delas av affärsnotiserna (🔔) och quizpåminnelserna.
+// 'ma.deals' säger om 🔔 är på: '1' = på, '0' = av. Saknas värdet (äldre installation) räknas en befintlig prenumeration som på.
+const dealsFlag = () => { try { return localStorage.getItem('ma.deals'); } catch { return null; } };
+const setDealsFlag = (v) => { try { localStorage.setItem('ma.deals', v); } catch {} };
+const dealsOn = (sub) => (dealsFlag() === '1' ? !!sub : dealsFlag() === '0' ? false : !!sub);
+
 async function refreshBell() {
   const sub = reg && (await reg.pushManager.getSubscription());
-  $('#bell').classList.toggle('on', !!sub);
-  $('#bell').textContent = sub ? '🔔 På' : '🔔 Notiser';
+  const on = dealsOn(sub);
+  $('#bell').classList.toggle('on', on);
+  $('#bell').textContent = on ? '🔔 På' : '🔔 Notiser';
 }
 
 $('#bell').addEventListener('click', async () => {
@@ -76,15 +83,20 @@ $('#bell').addEventListener('click', async () => {
   }
   if (!reg) return alert('Notistjänsten startade inte. Ladda om appen och försök igen.');
   const existing = await reg.pushManager.getSubscription();
-  if (existing) {
+  if (existing && dealsOn(existing)) {
+    // Stäng av affärsnotiser. Själva prenumerationen behålls om en quizpåminnelse använder den.
     await rpc('ma_unsubscribe', { p_endpoint: existing.endpoint });
-    await existing.unsubscribe();
+    setDealsFlag('0');
+    let reminderActive = false;
+    try { reminderActive = !!(await (await rpc('ma_reminder_get', { p_endpoint: existing.endpoint })).json()).enabled; } catch {}
+    if (!reminderActive) await existing.unsubscribe();
     return refreshBell();
   }
   if ((await Notification.requestPermission()) !== 'granted') return alert('Notiser nekades.');
-  const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64(C.VAPID_PUBLIC_KEY) });
+  const sub = existing || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64(C.VAPID_PUBLIC_KEY) });
   const j = sub.toJSON();
   await rpc('ma_subscribe', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth, p_min: minImp });
+  setDealsFlag('1');
   await reg.showNotification('Din Finans App', { body: 'Notiser fungerar ✅', icon: 'icon-192.png' });
   refreshBell();
 });

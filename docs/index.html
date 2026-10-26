@@ -115,6 +115,11 @@
   .gtools { display:flex; gap:16px; margin-top:4px; }
   .gtools .qlink { padding:6px 0 0; font-size:13px; }
   .qlink.danger { color:var(--bad); }
+  /* Quizpåminnelse */
+  .rtimes { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .rtime { display:flex; align-items:center; gap:8px; }
+  .rtime span { width:20px; color:var(--muted); font-size:13px; text-align:center; }
+  .rtime input { min-height:48px; padding:8px 10px; flex:1; min-width:0; }
   /* Intervjuträning */
   .iqsec { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
   .iqq { font-size:19px; font-weight:700; line-height:1.35; margin:6px 0 12px; }
@@ -162,6 +167,7 @@
 <script src="quiz-data.js"></script>
 <script src="terms.js"></script>
 <script src="quiz.js"></script>
+<script src="reminder.js"></script>
 <script src="glossary.js"></script>
 <script src="interview.js"></script>
 <script src="tabs.js"></script>

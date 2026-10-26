@@ -95,7 +95,8 @@
         </div>
         <button class="qbtn primary" id="qstart" ${pool < 4 ? 'disabled' : ''}>${pool < 4 ? 'För få frågor här än' : `Starta (${Math.min(ROUND, pool)} frågor)`}</button>
         ${seen ? '<button class="qbtn ghost" id="qreset">Nollställ framsteg</button>' : ''}
-      </div>`;
+      </div>
+      <div class="card" id="qreminder"></div>`;
     $('#qcats').onclick = (e) => { const b = e.target.closest('[data-cat]'); if (b) { cat = b.dataset.cat; renderHome(); } };
     $('#qmode').onclick = (e) => { const b = e.target.closest('[data-mode]'); if (b) { mode = b.dataset.mode; renderHome(); } };
     $('#qtype').onclick = (e) => {
@@ -106,6 +107,7 @@
       renderHome();
     };
     $('#qstart').onclick = start;
+    if (window.Reminder) window.Reminder.mount($('#qreminder'));
     const reset = $('#qreset');
     if (reset) reset.onclick = () => { if (confirm('Nollställa all quiz-statistik?')) { stats = {}; saveStats(); renderHome(); } };
   }
