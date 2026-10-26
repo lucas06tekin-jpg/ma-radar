@@ -2,7 +2,7 @@ self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
 
 self.addEventListener('push', (event) => {
-  const d = event.data ? event.data.json() : { title: 'M&A Radar', body: 'Ny affär' };
+  const d = event.data ? event.data.json() : { title: 'Din Finans App', body: 'Ny affär' };
   event.waitUntil(
     self.registration.showNotification(d.title, {
       body: d.body,

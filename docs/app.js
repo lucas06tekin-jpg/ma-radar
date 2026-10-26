@@ -85,7 +85,7 @@ $('#bell').addEventListener('click', async () => {
   const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64(C.VAPID_PUBLIC_KEY) });
   const j = sub.toJSON();
   await rpc('ma_subscribe', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth, p_min: minImp });
-  await reg.showNotification('M&A Radar', { body: 'Notiser fungerar ✅', icon: 'icon-192.png' });
+  await reg.showNotification('Din Finans App', { body: 'Notiser fungerar ✅', icon: 'icon-192.png' });
   refreshBell();
 });
 
