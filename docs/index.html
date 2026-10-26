@@ -93,6 +93,16 @@
   .qmiss { padding:10px 0; border-top:1px solid var(--line); font-size:14px; }
   .qmiss b { color:var(--accent); margin-right:6px; }
   .qmiss span { display:block; color:var(--muted); font-size:13px; margin-top:2px; }
+  /* Ordlista */
+  .gchips { margin:10px 0 4px; }
+  .gcount { font-size:12px; color:var(--muted); margin:8px 0 4px; }
+  .gletter { position:sticky; top:106px; z-index:2; margin:10px 0 6px; padding:4px 0; background:var(--bg); font-size:13px; font-weight:700; color:var(--accent); letter-spacing:.08em; }
+  .gitem { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:8px; }
+  .ghead { display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .gabbr { font-size:18px; color:var(--accent); word-break:break-word; }
+  .gcat { font-size:11px; color:var(--muted); text-align:right; }
+  .gfull { font-weight:600; margin-top:2px; }
+  .gexp { margin:4px 0 0; font-size:14px; color:var(--muted); }
   @media (max-width:420px){ .verdicts{grid-template-columns:1fr;} .qabbr{font-size:38px;} }
 </style>
 </head>
@@ -102,6 +112,7 @@
   <nav class="tabs">
     <button class="tab active" data-view="deals">📰 Affärer</button>
     <button class="tab" data-view="quiz">🧠 Quiz</button>
+    <button class="tab" data-view="glossary">📖 Ordlista</button>
   </nav>
   <div class="filters" id="filters">
     <button class="chip active" data-min="1">Alla</button>
@@ -115,10 +126,13 @@
   <div id="list"><div class="empty">Laddar affärer…</div></div>
 </main>
 <main id="view-quiz" hidden></main>
+<main id="view-glossary" hidden></main>
 <footer>AI-genererade sammanfattningar och bedömningar – inte finansiell rådgivning.</footer>
 <script src="config.js"></script>
 <script src="app.js"></script>
 <script src="quiz-data.js"></script>
 <script src="quiz.js"></script>
+<script src="glossary.js"></script>
+<script src="tabs.js"></script>
 </body>
 </html>

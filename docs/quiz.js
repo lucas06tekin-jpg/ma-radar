@@ -245,17 +245,6 @@
     $('#qhome').onclick = renderHome;
   }
 
-  // ---------- flikar ----------
-  function show(view) {
-    const quiz = view === 'quiz';
-    $('#view-deals').hidden = quiz;
-    $('#view-quiz').hidden = !quiz;
-    $('#filters').hidden = quiz;
-    document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.view === view));
-    try { history.replaceState(null, '', quiz ? '#quiz' : location.pathname + location.search); } catch {}
-    if (quiz && !round) renderHome();
-    window.scrollTo(0, 0);
-  }
-  document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => show(t.dataset.view)));
-  if (location.hash === '#quiz') show('quiz');
+  // Anropas av flikhanteraren (tabs.js) när Quiz-fliken öppnas
+  window.onQuizShow = () => { if (!round) renderHome(); };
 })();
