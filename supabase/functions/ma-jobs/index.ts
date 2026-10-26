@@ -36,7 +36,7 @@ const CF_QUERIES = ["corporate finance", "M&A", "mergers acquisitions", "private
 // Rubriken måste tala om corporate finance/M&A, eller beskrivningens första rader måste göra det tydligt (annars fångas t.ex. "CDD Analyst" för penningtvätt).
 const CF_HEAD = /corporate finance|\bm&a\b|mergers|acquisitions|private equity|investment (bank|associate|analyst|manager|director|professional)|financial advisory|transaktionsrådgiv|transaction (advisory|services|support)|corporate development|\blbo\b|venture capital|equity research|fusioner och förvärv|förvärv och avyttring/i;
 const CF_BODY = /corporate finance|\bm&a\b|mergers (and|&) acquisitions|private equity|investment bank|transaktionsrådgiv/i;
-const NOISE = /tjäna\s+\d|mötesbokare|telefonförsäljare|säljare|kundtjänst|merchandiser|butik|kundmottagare|nätverksmarknad|provisionsbaserad|vaktmästare|städ|kundbemöt|service och kund|servicepersonal|professor|lektor|doktorand|solution architect|systems business analyst/i;
+const NOISE = /tjäna\s+\d|mötesbokare|telefonförsäljare|säljare|kundtjänst|merchandiser|butik|kundmottagare|nätverksmarknad|provisionsbaserad|vaktmästare|städ|kundbemöt|service och kund|kundservice|customer service|spontan|open application|servicepersonal|professor|lektor|doktorand|solution architect|systems business analyst/i;
 
 // ---------- Bolagens egna karriärsidor ----------
 const get = async (url: string, init: RequestInit = {}) =>
