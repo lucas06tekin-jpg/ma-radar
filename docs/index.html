@@ -78,6 +78,12 @@
   .qopt.right { border-color:var(--good); background:rgba(52,211,153,.15); }
   .qopt.wrong { border-color:var(--bad); background:rgba(248,113,113,.15); }
   .qopt:disabled { color:var(--text); }
+  .qinput { display:block; width:100%; min-height:54px; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--text); font:inherit; font-size:17px; } /* 16px+ hindrar iOS från att zooma */
+  .qinput:focus { outline:none; border-color:var(--accent); }
+  .qinput.right { border-color:var(--good); background:rgba(52,211,153,.15); }
+  .qinput.wrong { border-color:var(--bad); background:rgba(248,113,113,.15); }
+  .qinput:disabled { color:var(--text); opacity:1; -webkit-text-fill-color:var(--text); }
+  .qlink { background:none; border:none; padding:10px 0 0; color:var(--accent); font-size:14px; text-decoration:underline; }
   .qfb { margin-top:14px; border-radius:12px; padding:12px; background:rgba(255,255,255,.04); border-left:4px solid var(--good); }
   .qfb.no { border-color:var(--bad); }
   .qfull { font-weight:700; margin-top:4px; }

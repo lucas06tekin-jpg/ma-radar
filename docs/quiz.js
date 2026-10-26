@@ -55,6 +55,8 @@
   let cat = 'all';
   let mode = 'mixed'; // 'mixed' | 'missed'
   let round = null;
+  let qtype = 'choice'; // 'choice' = flerval, 'type' = skriv svaret själv
+  try { if (localStorage.getItem('quizType') === 'type') qtype = 'type'; } catch {}
 
   const poolFor = () => {
     let p = cat === 'all' ? ALL : ALL.filter((q) => q.c === cat);
@@ -70,7 +72,7 @@
     root().innerHTML = `
       <div class="card">
         <h2 class="qh">Förkortnings-quiz</h2>
-        <p class="qsub">Du får en förkortning och ska välja rätt betydelse. De du missar kommer tillbaka oftare.</p>
+        <p class="qsub">Du får en förkortning och ska välja eller skriva rätt betydelse. De du missar kommer tillbaka oftare.</p>
         <div class="qstats">
           <div><b>${seen}</b><span>sedda av ${ALL.length}</span></div>
           <div><b>${mastered}</b><span>bemästrade</span></div>
@@ -86,11 +88,23 @@
           <button class="chip ${mode === 'mixed' ? 'active' : ''}" data-mode="mixed">Blandat</button>
           <button class="chip ${mode === 'missed' ? 'active' : ''}" data-mode="missed">Bara det jag missat</button>
         </div>
+        <div class="qlabel">Svarssätt</div>
+        <div class="qchips" id="qtype">
+          <button class="chip ${qtype === 'choice' ? 'active' : ''}" data-type="choice">Flerval</button>
+          <button class="chip ${qtype === 'type' ? 'active' : ''}" data-type="type">Skriv själv</button>
+        </div>
         <button class="qbtn primary" id="qstart" ${pool < 4 ? 'disabled' : ''}>${pool < 4 ? 'För få frågor här än' : `Starta (${Math.min(ROUND, pool)} frågor)`}</button>
         ${seen ? '<button class="qbtn ghost" id="qreset">Nollställ framsteg</button>' : ''}
       </div>`;
     $('#qcats').onclick = (e) => { const b = e.target.closest('[data-cat]'); if (b) { cat = b.dataset.cat; renderHome(); } };
     $('#qmode').onclick = (e) => { const b = e.target.closest('[data-mode]'); if (b) { mode = b.dataset.mode; renderHome(); } };
+    $('#qtype').onclick = (e) => {
+      const b = e.target.closest('[data-type]');
+      if (!b) return;
+      qtype = b.dataset.type;
+      try { localStorage.setItem('quizType', qtype); } catch {}
+      renderHome();
+    };
     $('#qstart').onclick = start;
     const reset = $('#qreset');
     if (reset) reset.onclick = () => { if (confirm('Nollställa all quiz-statistik?')) { stats = {}; saveStats(); renderHome(); } };
@@ -102,46 +116,117 @@
     renderQuestion();
   }
 
+  // ---------- tolerant jämförelse av skrivna svar ----------
+  // Stora/små bokstäver, accenter, bindestreck, skiljetecken och extra mellanslag spelar ingen roll. "&" = "and".
+  const norm = (s) => String(s).toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/&/g, ' and ').replace(/[^\p{L}\p{N}]+/gu, ' ').trim().replace(/\s+/g, ' ');
+  // Redigeringsavstånd där två omkastade grannbokstäver ("yeild") räknas som ett fel.
+  const dist = (a, b) => {
+    const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+    for (let j = 1; j <= b.length; j++) d[0][j] = j;
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+        if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+      }
+    }
+    return d[a.length][b.length];
+  };
+  // 'exact' = rätt, 'close' = godkänt med litet stavfel, 'no' = fel. Små stavfel tillåts på längre svar.
+  function grade(input, q) {
+    const a = norm(input), b = norm(q.f);
+    if (!a) return 'no';
+    if (a === b || a.replace(/ /g, '') === b.replace(/ /g, '')) return 'exact';
+    const allowed = b.length >= 16 ? 2 : b.length >= 7 ? 1 : 0;
+    return allowed && dist(a, b) <= allowed ? 'close' : 'no';
+  }
+
   function renderQuestion() {
     const q = round.qs[round.i];
-    const opts = options(q);
+    const typed = qtype === 'type';
+    const opts = typed ? null : options(q);
     root().innerHTML = `
       <div class="qprog"><span>Fråga ${round.i + 1} av ${round.qs.length}</span><span>${round.score} rätt</span></div>
       <div class="qbar"><i style="width:${(round.i / round.qs.length) * 100}%"></i></div>
       <div class="card qcard">
         <div class="qcat">${esc(CATS[q.c])}</div>
         <div class="qabbr">${esc(q.a)}</div>
-        <div class="qask">Vad står det för?</div>
-        <div class="qopts">${opts.map((o, k) => `<button class="qopt" data-k="${k}">${esc(o.f)}</button>`).join('')}</div>
+        <div class="qask">${typed ? 'Skriv vad det står för' : 'Vad står det för?'}</div>
+        ${typed
+          ? `<form id="qform" autocomplete="off">
+               <input id="qinput" class="qinput" type="text" inputmode="text" enterkeyhint="done"
+                 autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Skriv ditt svar…" aria-label="Ditt svar">
+               <button class="qbtn primary" id="qsubmit" type="submit">Svara</button>
+               <button class="qbtn ghost" id="qskip" type="button">Jag vet inte</button>
+             </form>`
+          : `<div class="qopts">${opts.map((o, k) => `<button class="qopt" data-k="${k}">${esc(o.f)}</button>`).join('')}</div>`}
         <div id="qfb"></div>
       </div>`;
-    root().querySelector('.qopts').onclick = (e) => {
-      const b = e.target.closest('.qopt');
-      if (!b || b.disabled) return;
-      answer(q, opts, Number(b.dataset.k));
-    };
+    if (typed) {
+      const input = $('#qinput');
+      input.focus();
+      $('#qform').onsubmit = (e) => { e.preventDefault(); if (input.disabled) return; finishTyped(q, input.value, false); };
+      $('#qskip').onclick = () => { if (!input.disabled) finishTyped(q, '', true); };
+    } else {
+      root().querySelector('.qopts').onclick = (e) => {
+        const b = e.target.closest('.qopt');
+        if (!b || b.disabled) return;
+        answer(q, opts, Number(b.dataset.k));
+      };
+    }
   }
 
+  // Flervalsfråga
   function answer(q, opts, k) {
     const ok = opts[k].a === q.a;
-    record(q.a, ok);
-    if (ok) round.score++; else round.missed.push(q);
     root().querySelectorAll('.qopt').forEach((b, j) => {
       b.disabled = true;
       if (opts[j].a === q.a) b.classList.add('right');
       else if (j === k) b.classList.add('wrong');
     });
+    reveal(q, ok, ok ? '' : `<p class="qwrongnote">Du valde: ${esc(opts[k].f)} <span>(${esc(opts[k].a)})</span></p>`);
+  }
+
+  // Skriven fråga
+  function finishTyped(q, text, skipped) {
+    const g = skipped ? 'no' : grade(text, q);
+    const input = $('#qinput');
+    input.disabled = true;
+    $('#qsubmit').hidden = true;
+    $('#qskip').hidden = true;
+    input.classList.add(g === 'no' ? 'wrong' : 'right');
+    const note = g === 'close' ? `<p class="qwrongnote">Nästan! Rätt stavning: <b>${esc(q.f)}</b>. Godkänt.</p>`
+      : g === 'no' ? `<p class="qwrongnote">${skipped ? 'Du hoppade över.' : `Du skrev: ${esc(text.trim())}`}</p>` : '';
+    reveal(q, g !== 'no', note, g === 'no' && !skipped);
+  }
+
+  // Visar facit, sparar resultatet och tar fram "Nästa". canOverride = erbjud "Räkna som rätt" (skrivna svar).
+  function reveal(q, ok, note, canOverride = false) {
+    const before = JSON.parse(JSON.stringify(st(q.a)));
+    record(q.a, ok);
+    if (ok) round.score++; else round.missed.push(q);
     const last = round.i + 1 >= round.qs.length;
     $('#qfb').innerHTML = `
-      <div class="qfb ${ok ? 'ok' : 'no'}">
+      <div class="qfb ${ok ? 'ok' : 'no'}" id="qfbbox">
         <b>${ok ? '✅ Rätt!' : '❌ Fel'}</b>
         <div class="qfull">${esc(q.a)} = ${esc(q.f)}</div>
         <p>${esc(q.s)}</p>
-        ${!ok ? `<p class="qwrongnote">Du valde: ${esc(opts[k].f)} <span>(${esc(opts[k].a)})</span></p>` : ''}
+        ${note}
+        ${canOverride ? '<button class="qlink" id="qoverride" type="button">Jag hade rätt, räkna som rätt</button>' : ''}
       </div>
       <button class="qbtn primary" id="qnext">${last ? 'Se resultat' : 'Nästa →'}</button>`;
     $('#qnext').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     $('#qnext').onclick = () => { round.i++; last ? renderResult() : renderQuestion(); };
+    const ov = $('#qoverride');
+    if (ov) ov.onclick = () => {
+      stats[q.a] = before; record(q.a, true); // ångra felet och räkna rätt
+      round.missed = round.missed.filter((m) => m.a !== q.a);
+      round.score++;
+      $('#qfbbox').className = 'qfb ok';
+      $('#qfbbox').querySelector('b').textContent = '✅ Räknat som rätt';
+      ov.remove();
+      document.querySelector('.qprog span:last-child').textContent = `${round.score} rätt`;
+    };
   }
 
   function renderResult() {
