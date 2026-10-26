@@ -121,7 +121,7 @@
   function renderGate() {
     host.innerHTML = `
       <div class="card">
-        <h3 class="qh" style="font-size:18px">📋 Jobbspårare</h3>
+        <h3 class="qh" style="font-size:18px">Jobbspårare</h3>
         <p class="qsub">Håll koll på jobb du sparat och sökt, med status, sista ansökningsdag, anteckningar och påminnelser. Allt är privat och följer med mellan dina enheter.</p>
         ${flash ? `<div class="gflash">${esc(flash)}</div>` : ''}
         ${loading ? '<div class="empty">Hämtar…</div>' : `
@@ -181,8 +181,8 @@
       ${i.notes ? `<p class="nsum tnotes">${esc(i.notes.length > 160 ? i.notes.slice(0, 160) + '…' : i.notes)}</p>` : ''}
       <div class="trow">
         <select class="qinput tstatus" data-id="${i.id}" aria-label="Status">${Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${i.status === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
-        <button class="qlink" data-edit="${i.id}">✏️ Ändra</button>
-        <button class="qlink danger" data-del="${i.id}">🗑 Ta bort</button>
+        <button class="qlink" data-edit="${i.id}">Ändra</button>
+        <button class="qlink danger" data-del="${i.id}">Ta bort</button>
       </div>
     </article>`;
   }
@@ -196,12 +196,12 @@
       ${flash ? `<div class="gflash">${esc(flash)}</div>` : ''}
       <div class="tbar">
         <button class="chip active" id="tadd">＋ Lägg till jobb</button>
-        <button class="chip" id="tlock">🔒 Lås</button>
+        <button class="chip" id="tlock">Lås</button>
       </div>
       ${urgent ? `<div class="gflash" style="border-color:var(--bad)">⏰ ${urgent} sparat${urgent > 1 ? 'e' : ''} jobb har sista ansökningsdag inom 3 dagar.</div>` : ''}
       <div id="tform"></div>
       <div class="qchips" id="tfilters">${GROUPS.map(([k, v]) => `<button class="chip ${filter === k ? 'active' : ''}" data-f="${k}">${v} ${counts[k]}</button>`).join('')}</div>
-      <div id="tlist" style="margin-top:12px">${list.length ? list.map(renderCard).join('') : `<div class="empty">${items.length ? 'Inga jobb i den här gruppen.' : 'Inga jobb än. Tryck ⭐ Spara på ett jobb i flödet, eller <b>＋ Lägg till jobb</b> för att lägga in ett från en annan sajt.'}</div>`}</div>
+      <div id="tlist" style="margin-top:12px">${list.length ? list.map(renderCard).join('') : `<div class="empty">${items.length ? 'Inga jobb i den här gruppen.' : 'Inga jobb än. Tryck Spara på ett jobb i flödet, eller <b>＋ Lägg till jobb</b> för att lägga in ett från en annan sajt.'}</div>`}</div>
       <div class="card" id="tpush" style="padding:0"></div>
       <div class="card" id="tquick" style="padding:0"></div>`;
     $('#tadd', host).onclick = () => { form = { item: { status: 'saved' } }; flash = ''; render(); };
@@ -243,7 +243,7 @@
           <input id="fu" class="qinput" type="url" inputmode="url" placeholder="Länk till annonsen (valfritt)" value="${esc(it.url || '')}" autocapitalize="off" autocorrect="off" spellcheck="false">
           <button class="chip" type="button" id="fpaste">Klistra in</button>
         </div>
-        <button class="qbtn ghost" type="button" id="ffetch" style="min-height:40px">🔍 Hämta uppgifter från länken</button>
+        <button class="qbtn ghost" type="button" id="ffetch" style="min-height:40px">Hämta uppgifter från länken</button>
         <input id="ft" class="qinput" placeholder="Roll *" maxlength="200" value="${esc(it.title || '')}">
         <input id="fe" class="qinput" placeholder="Arbetsgivare" maxlength="120" value="${esc(it.employer || '')}">
         <input id="fl" class="qinput" placeholder="Ort" maxlength="80" value="${esc(it.location || '')}">
@@ -311,10 +311,10 @@
     const blocked = window.PushUtil.blockedReason();
     const DAYS = [[7, '7 dagar före'], [3, '3 dagar före'], [1, '1 dag före'], [0, 'Samma dag']];
     el.innerHTML = `
-      <button class="nnotehead" id="ptoggle" aria-expanded="${push.open}"><span>🔔 Påminnelser: <b>${on ? 'På' : 'Av'}</b></span><span class="nchev">${push.open ? '▲' : '▼'}</span></button>
+      <button class="nnotehead" id="ptoggle" aria-expanded="${push.open}"><span>Påminnelser: <b>${on ? 'På' : 'Av'}</b></span><span class="nchev">${push.open ? '▲' : '▼'}</span></button>
       ${push.open ? `<div class="nnotebody">
         <p class="iqnote" style="margin-top:10px">En samlad notis klockan 09 på dagen för sparade jobb som du inte sökt än, och när det är dags att följa upp.</p>
-        ${blocked ? `<div class="banner">📲 ${esc(blocked)}</div>` : ''}
+        ${blocked ? `<div class="banner">${esc(blocked)}</div>` : ''}
         <div class="qlabel">Påminn mig före sista ansökningsdag</div>
         <div class="qchips" id="pdays">${DAYS.map(([d, l]) => `<button class="chip ${push.days.includes(d) ? 'active' : ''}" data-d="${d}">${l}</button>`).join('')}</div>
         <button class="qbtn primary" id="psave" ${blocked || push.busy ? 'disabled' : ''}>${on ? 'Uppdatera' : 'Slå på påminnelser'}</button>
@@ -355,7 +355,7 @@
     if (!el) return;
     const code = bookmarklet();
     el.innerHTML = `
-      <button class="nnotehead" id="qtoggle" aria-expanded="${quickOpen}"><span>🔖 Spara jobb från andra sajter snabbt</span><span class="nchev">${quickOpen ? '▲' : '▼'}</span></button>
+      <button class="nnotehead" id="qtoggle" aria-expanded="${quickOpen}"><span>Spara jobb från andra sajter snabbt</span><span class="nchev">${quickOpen ? '▲' : '▼'}</span></button>
       ${quickOpen ? `<div class="nnotebody">
         <p class="iqnote" style="margin-top:10px"><b>Enklast:</b> kopiera länken till annonsen, tryck <b>＋ Lägg till jobb</b>, tryck <b>Klistra in</b> och sedan <b>Hämta uppgifter från länken</b>. Appen försöker fylla i roll, arbetsgivare, ort och sista ansökningsdag. På en del sajter, till exempel LinkedIn, går det inte alltid utan inloggning, och då fyller du i resten själv.</p>
         <p class="iqnote"><b>Ett tryck:</b> spara bokmärket nedan i webbläsaren. När du står på en jobbannons trycker du på det, så öppnas appen med länken och rubriken ifylld.</p>

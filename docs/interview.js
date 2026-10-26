@@ -6,7 +6,7 @@
   const root = () => $('#view-interview');
   const ROUND = 10;
   const GROUPS = { fit: 'Personliga frågor', deal: 'Affärer & restructuring', tech: 'Tekniska frågor', brain: 'Hjärngympa' };
-  const RATE = { missed: '😕 Missade', partial: '🙂 Delvis', nailed: '✅ Klarade' };
+  const RATE = { missed: 'Missade', partial: 'Delvis', nailed: 'Klarade' };
 
   const PASS_KEY = 'ma.admin'; // samma lösenord och samma "kom ihåg" som i ordlistans redigeringsläge
   let pass = null;
@@ -126,7 +126,7 @@
           <button class="chip ${mode === 'hard' ? 'active' : ''}" data-m="hard">Det jag missat</button>
         </div>
         <button class="qbtn primary" id="istart" ${n < 1 ? 'disabled' : ''}>${n < 1 ? 'Inga frågor i det här urvalet' : `Starta (${Math.min(ROUND, n)} frågor)`}</button>
-        <button class="qbtn ghost" id="ilock">🔒 Lås</button>
+        <button class="qbtn ghost" id="ilock">Lås</button>
         <p class="iqnote">Frågor och facit är hämtade ur din egen kopia av boken och sparas inte på den här enheten. Dina svar sparas på ditt konto så att de följer med mellan enheter.</p>
       </div>`;
     $('#igrp').onclick = (e) => { const b = e.target.closest('[data-g]'); if (b) { grp = b.dataset.g; renderHome(); } };

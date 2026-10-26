@@ -99,7 +99,7 @@
         ${j.snippet ? `<p class="nsum">${esc(j.snippet.length > 180 ? j.snippet.slice(0, 180) + '…' : j.snippet)}</p>` : ''}
         <div class="ntags"><span>${esc(CATS[j.category])}</span>${j.occupation ? `<span>${esc(j.occupation)}</span>` : ''}
           ${j.deadline ? `<span class="${dl <= 7 ? 'jurgent' : ''}">Sista ansökan ${esc(fmtDate(j.deadline))}${dl >= 0 ? ` (${dl === 0 ? 'idag' : dl === 1 ? 'imorgon' : 'om ' + dl + ' d'})` : ''}</span>` : ''}</div>
-        <div class="jlinks"><a href="${esc(j.url)}" target="_blank" rel="noopener">Öppna annons →</a>${j.apply_url ? `<a href="${esc(j.apply_url)}" target="_blank" rel="noopener">Ansök hos arbetsgivaren →</a>` : ''}<button class="jstar ${saved ? 'on' : ''}" data-save="${esc(j.id)}">${saved ? '⭐ Sparad' : '☆ Spara'}</button></div>
+        <div class="jlinks"><a href="${esc(j.url)}" target="_blank" rel="noopener">Öppna annons →</a>${j.apply_url ? `<a href="${esc(j.apply_url)}" target="_blank" rel="noopener">Ansök hos arbetsgivaren →</a>` : ''}<button class="jstar ${saved ? 'on' : ''}" data-save="${esc(j.id)}">${saved ? 'Sparad' : 'Spara'}</button></div>
       </article>`;
     }).join('')
       : `<div class="empty">Inga jobb i det här urvalet.${f.level === 'stud' ? ' De flesta annonser kräver erfarenhet, så prova <b>Alla nivåer</b> eller en annan region.' : ''}</div>`;
@@ -125,11 +125,11 @@
     const blocked = window.PushUtil.blockedReason();
     el.innerHTML = `
       <button class="nnotehead" id="jtoggle" aria-expanded="${note.open}">
-        <span>🔔 Jobbnotiser: <b>${on ? 'På' : 'Av'}</b></span><span class="nchev">${note.open ? '▲' : '▼'}</span>
+        <span>Jobbnotiser: <b>${on ? 'På' : 'Av'}</b></span><span class="nchev">${note.open ? '▲' : '▼'}</span>
       </button>
       ${note.open ? `
         <div class="nnotebody">
-          ${blocked ? `<div class="banner">📲 ${esc(blocked)}</div>` : ''}
+          ${blocked ? `<div class="banner">${esc(blocked)}</div>` : ''}
           <div class="qlabel">Nivå</div>
           <div class="qchips" id="jnlevels">${Object.entries(LEVELS).map(([k, v]) => `<button class="chip ${note.levels.includes(k) ? 'active' : ''}" data-l="${k}">${v}</button>`).join('')}</div>
           <div class="qlabel">Område</div>
@@ -182,7 +182,7 @@
     const el = $('#jcareer');
     if (!el) return;
     el.innerHTML = `
-      <button class="nnotehead" id="jctoggle" aria-expanded="${careerOpen}"><span>🎯 Karriärsidor: banker, riskkapital, myndigheter</span><span class="nchev">${careerOpen ? '▲' : '▼'}</span></button>
+      <button class="nnotehead" id="jctoggle" aria-expanded="${careerOpen}"><span>Karriärsidor: banker, riskkapital, myndigheter</span><span class="nchev">${careerOpen ? '▲' : '▼'}</span></button>
       ${careerOpen ? `<div class="nnotebody">
         <p class="iqnote" style="margin-top:10px">De stora trainee- och praktikprogrammen rekryteras oftast via bolagens egna sidor och dyker sällan upp i Platsbanken. Länkarna fungerade när jag kontrollerade dem.</p>
         ${Object.entries(CAREER).map(([g, ls]) => `<div class="qlabel">${esc(g)}</div><div class="jcareerlinks">${ls.map(([n, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join('')}</div>`).join('')}
@@ -193,7 +193,7 @@
   // ---------- uppbyggnad ----------
   function build() {
     root().innerHTML = `
-      <div class="qchips tseg" id="jseg"><button class="chip active" data-v="find">🔎 Hitta jobb</button><button class="chip" data-v="track">📋 Min spårare</button></div>
+      <div class="qchips tseg" id="jseg"><button class="chip active" data-v="find">Hitta jobb</button><button class="chip" data-v="track">Min spårare</button></div>
       <div id="jfind">
       <div class="card" id="jnote" style="padding:0"></div>
       <div class="card" id="jcareer" style="padding:0"></div>

@@ -47,7 +47,7 @@
       <article class="card ncard">
         <div class="nmeta">
           <b>${esc(n.source)}</b><span>${esc(ago(n.published))}</span>
-          ${n.paywall === 'paid' ? '<span class="npill paid" title="Kräver ofta prenumeration">🔒 Betalvägg</span>' : ''}
+          ${n.paywall === 'paid' ? '<span class="npill paid" title="Kräver ofta prenumeration">Betalvägg</span>' : ''}
           ${n.importance >= 5 ? '<span class="npill big">Stor nyhet</span>' : n.importance === 4 ? '<span class="npill imp">Viktig</span>' : ''}
         </div>
         <a class="ntitle" href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a>
@@ -75,11 +75,11 @@
     const blocked = window.PushUtil.blockedReason();
     el.innerHTML = `
       <button class="nnotehead" id="ntoggle" aria-expanded="${note.open}">
-        <span>🔔 Nyhetsnotiser: <b>${on ? 'På' : 'Av'}</b></span><span class="nchev">${note.open ? '▲' : '▼'}</span>
+        <span>Nyhetsnotiser: <b>${on ? 'På' : 'Av'}</b></span><span class="nchev">${note.open ? '▲' : '▼'}</span>
       </button>
       ${note.open ? `
         <div class="nnotebody">
-          ${blocked ? `<div class="banner">📲 ${esc(blocked)}</div>` : ''}
+          ${blocked ? `<div class="banner">${esc(blocked)}</div>` : ''}
           <div class="qlabel">Vilka nyheter ger notis</div>
           <div class="qchips" id="nlevel">
             ${[5, 4, 3].map((k) => `<button class="chip ${note.min === k ? 'active' : ''}" data-min="${k}">${LEVELS[k]}</button>`).join('')}
@@ -133,9 +133,9 @@
         <button class="chip" data-f="sv">🇸🇪 Svenska</button>
         <button class="chip" data-f="en">🇬🇧 Engelska</button>
       </div>
-      <label class="gremember" style="margin:8px 0 12px"><input type="checkbox" id="nhidepaid" ${hidePaid ? 'checked' : ''}> Dölj betalartiklar 🔒</label>
+      <label class="gremember" style="margin:8px 0 12px"><input type="checkbox" id="nhidepaid" ${hidePaid ? 'checked' : ''}> Dölj betalartiklar </label>
       <div id="nlist"></div>
-      <p class="iqnote">Sammanfattningar och bedömningar är AI-genererade från rubrik och ingress, inte från hela artikeln, och är inte finansiell rådgivning. 🔒 betyder att artikeln ofta kräver prenumeration hos källan. Utan märke är den gratis eller okänd.</p>`;
+      <p class="iqnote">Sammanfattningar och bedömningar är AI-genererade från rubrik och ingress, inte från hela artikeln, och är inte finansiell rådgivning. betyder att artikeln ofta kräver prenumeration hos källan. Utan märke är den gratis eller okänd.</p>`;
     $('#nfilters').onclick = (e) => {
       const b = e.target.closest('[data-f]');
       if (!b) return;

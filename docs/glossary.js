@@ -69,7 +69,7 @@
         <div class="ghead"><b class="gabbr">${esc(x.a)}</b><span class="gcat">${esc(CATS[x.c] || '')}</span></div>
         <div class="gfull">${esc(x.f)}</div>
         <p class="gexp">${esc(x.s)}</p>
-        ${pass ? `<div class="gtools"><button class="qlink" data-edit="${esc(x.a)}">✏️ Ändra</button><button class="qlink danger" data-del="${esc(x.a)}">🗑 Ta bort</button></div>` : ''}
+        ${pass ? `<div class="gtools"><button class="qlink" data-edit="${esc(x.a)}">Ändra</button><button class="qlink danger" data-del="${esc(x.a)}">Ta bort</button></div>` : ''}
       </div>`;
     }
     $('#gcount').textContent = `${hits.length} av ${ALL.length} förkortningar`;
@@ -124,8 +124,8 @@
       return;
     }
     el.innerHTML = `${msg}<div class="gbar">${pass
-      ? `<button class="chip active" id="gadd">＋ Lägg till</button><button class="chip" id="glock">🔓 Lås</button>`
-      : `<button class="chip" id="gunlock">🔒 Redigera</button>`}</div>`;
+      ? `<button class="chip active" id="gadd">＋ Lägg till</button><button class="chip" id="glock">Lås</button>`
+      : `<button class="chip" id="gunlock">Redigera</button>`}</div>`;
     if (pass) {
       $('#gadd').onclick = () => { panel = { edit: null }; flash = ''; renderTools(); };
       $('#glock').onclick = () => { forget(); flash = ''; renderTools(); renderList(); };

@@ -74,7 +74,7 @@ async function refreshBell() {
   const sub = reg && (await reg.pushManager.getSubscription());
   const on = dealsOn(sub);
   $('#bell').classList.toggle('on', on);
-  $('#bell').textContent = on ? '🔔 På' : '🔔 Notiser';
+  $('#bell').textContent = on ? 'Notiser: på' : 'Notiser';
 }
 
 $('#bell').addEventListener('click', async () => {
@@ -97,13 +97,13 @@ $('#bell').addEventListener('click', async () => {
   const j = sub.toJSON();
   await rpc('ma_subscribe', { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth, p_min: minImp });
   setDealsFlag('1');
-  await reg.showNotification('Din Finans App', { body: 'Notiser fungerar ✅', icon: 'icon-192.png' });
+  await reg.showNotification('Din Finans App', { body: 'Notiser fungerar ', icon: 'icon-192.png' });
   refreshBell();
 });
 
 (async () => {
   if (/iPhone|iPad/.test(navigator.userAgent) && !standalone) {
-    $('#banner').innerHTML = '<div class="banner">📲 För notiser: tryck <b>Dela</b> i Safari → <b>Lägg till på hemskärmen</b>, öppna sedan appen därifrån och tryck på 🔔.</div>';
+    $('#banner').innerHTML = '<div class="banner">För notiser: tryck <b>Dela</b> i Safari → <b>Lägg till på hemskärmen</b>, öppna sedan appen därifrån och tryck på Notiser.</div>';
   }
   load(); // affärerna ska laddas även om service workern inte går att registrera
   setInterval(load, 60000);

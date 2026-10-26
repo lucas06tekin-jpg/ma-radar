@@ -210,7 +210,7 @@
     const last = round.i + 1 >= round.qs.length;
     $('#qfb').innerHTML = `
       <div class="qfb ${ok ? 'ok' : 'no'}" id="qfbbox">
-        <b>${ok ? '✅ Rätt!' : '❌ Fel'}</b>
+        <b>${ok ? 'Rätt!' : 'Fel'}</b>
         <div class="qfull">${esc(q.a)} = ${esc(q.f)}</div>
         <p>${esc(q.s)}</p>
         ${note}
@@ -225,7 +225,7 @@
       round.missed = round.missed.filter((m) => m.a !== q.a);
       round.score++;
       $('#qfbbox').className = 'qfb ok';
-      $('#qfbbox').querySelector('b').textContent = '✅ Räknat som rätt';
+      $('#qfbbox').querySelector('b').textContent = 'Räknat som rätt';
       ov.remove();
       document.querySelector('.qprog span:last-child').textContent = `${round.score} rätt`;
     };
@@ -233,7 +233,7 @@
 
   function renderResult() {
     const n = round.qs.length, pct = Math.round((round.score / n) * 100);
-    const msg = pct === 100 ? 'Perfekt! 🏆' : pct >= 80 ? 'Mycket bra 💪' : pct >= 50 ? 'Helt okej, öva lite till' : 'Fortsätt öva, det sitter snart';
+    const msg = pct === 100 ? 'Perfekt! ' : pct >= 80 ? 'Mycket bra ' : pct >= 50 ? 'Helt okej, öva lite till' : 'Fortsätt öva, det sitter snart';
     root().innerHTML = `
       <div class="card">
         <h2 class="qh">${round.score} av ${n} rätt</h2>

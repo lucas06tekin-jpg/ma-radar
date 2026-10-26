@@ -70,8 +70,8 @@
     host.innerHTML = `
       <h3 class="qh" style="font-size:18px">⏰ Påminnelse</h3>
       <p class="qsub">Få en notis när det är dags att öva förkortningarna.</p>
-      ${on ? `<div class="gflash" style="margin-top:0">✅ På: ${esc(state.server.times.join(', '))}</div>` : ''}
-      ${blocked ? `<div class="banner">📲 ${!supported ? 'Notiser stöds inte i den här webbläsaren.' : 'På iPhone krävs att appen ligger på hemskärmen: tryck <b>Dela</b> i Safari, välj <b>Lägg till på hemskärmen</b> och öppna appen därifrån.'}</div>` : ''}
+      ${on ? `<div class="gflash" style="margin-top:0">På: ${esc(state.server.times.join(', '))}</div>` : ''}
+      ${blocked ? `<div class="banner">${!supported ? 'Notiser stöds inte i den här webbläsaren.' : 'På iPhone krävs att appen ligger på hemskärmen: tryck <b>Dela</b> i Safari, välj <b>Lägg till på hemskärmen</b> och öppna appen därifrån.'}</div>` : ''}
       <div class="qlabel">Antal gånger per dag</div>
       <div class="qchips" id="rcount">
         ${Array.from({ length: MAX }, (_, i) => i + 1).map((k) => `<button class="chip ${k === n ? 'active' : ''}" data-n="${k}">${k}</button>`).join('')}
